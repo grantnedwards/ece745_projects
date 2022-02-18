@@ -10,28 +10,56 @@ interface i2c_if        #(
 );
 bit start = 1'bx;
 shortint inc_addr;
-bit captured_addr [7:0];
+bit captured_burst [I2C_DATA_WIDTH+1];
+i2c_op_t op;
+i2c_state_t state;
+
+    task address_burst();
+        state = ADDR;
+        if(start)begin
+            foreach(captured_burst[i])begin
+                @(posedge scl_i)begin
+                    captured_burst[i] = sda_i;
+                end
+            end
+            start = 1'b0;
+            assign op = captured_burst[I2C_ADDR_WIDTH-1] ? READ : WRITE;
+        end
+    endtask
+
+    task data_burst();
+        state = DATA;
+        foreach(captured_burst[i])begin
+            @(posedge scl_i)begin
+                captured_burst[i] = sda_i;
+            end
+        end
+        
+
+    endtask
 
 //----------------------------------------------------------------
     task wait_for_i2c_transfers(
         //output i2c_op_t op, 
         //output bit [I2C_DATA_WIDTH-1:0] write_data[]
     );
-    ////asd/a/sd/asd/as/d/as/d
-    @(negedge sda_o)begin
-        if(scl_o)begin
+    @(negedge sda_i)begin
+        if(scl_i)begin
+            state = START;
             start = 1'b1;
         end
     end
-    if(start)begin
-        foreach(captured_addr[i])begin
-            @(posedge scl_o)begin
-                captured_addr[i] = sda_i;
-            end
+    
+    address_burst();
+    data_burst();
+
+    @(posedge sda_i)begin
+        if(scl_i)begin
+            state = STOP;
         end
-        start = 1'b0;
-        
     end
+
+    
 
 
     endtask
