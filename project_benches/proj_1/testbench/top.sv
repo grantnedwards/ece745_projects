@@ -75,6 +75,15 @@ initial
 
       write(8'h44);     // write in byte 0x44
       write(8'h78);     // write in byte 0x78
+      stop();           // enable stop command
+      wait_to_write();  // iterates until irq is high, reads value
+//======================================================
+      wb_bus.master_write(CSR, 8'b11xx_xxxx); //Enable iicmb and irq output
+      set_bus(8'h2);    // set bus
+      start(); // enable start command
+      write(8'h11); // write in byte 0x11
+      write(8'h32); 
+
 
       stop();           // enable stop command
 
