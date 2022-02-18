@@ -91,9 +91,8 @@ end
 
 initial 
       begin : i2c_test_flow
-      i2c_bus.wait_for_i2c_transfers();
-      i2c_bus.wait_for_i2c_transfers();
-      i2c_bus.wait_for_i2c_transfers();
+      forever i2c_bus.wait_for_i2c_transfers();
+
       
 end
 
