@@ -17,7 +17,7 @@ bit captured_addr [7:0];
         //output i2c_op_t op, 
         //output bit [I2C_DATA_WIDTH-1:0] write_data[]
     );
-    
+    ////asd/a/sd/asd/as/d/as/d
     @(negedge sda_o)begin
         if(scl_o)begin
             start = 1'b1;
