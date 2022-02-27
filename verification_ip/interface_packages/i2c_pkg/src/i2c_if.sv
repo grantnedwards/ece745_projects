@@ -1,120 +1,97 @@
 import globals::*;
-interface i2c_if        #(
-    int I2C_ADDR_WIDTH = 7,                                
-    int I2C_DATA_WIDTH = 8      )
-(
-    input triand scl_i,
-    input triand sda_i,
-    output triand scl_o,
-    output triand sda_o
-);
-bit start = 1'bx;
-bit [I2C_DATA_WIDTH+1] captured_burst;
-i2c_op_t op;
-i2c_state_t state;
-reg sda_reg = 1'b1;
-bit [I2C_DATA_WIDTH] burst_queue[$];
-bit [I2C_DATA_WIDTH] read_queue[$];
-assign sda_o = sda_reg ? 1'bz : 1'b0;
 
-    task is_valid_data();
-    	
-    endtask
+interface i2c_if #(
+    int I2C_ADDR_WIDTH = 7,
+    int I2C_DATA_WIDTH = 8
+    )
+    (
+        input triand scl_i,
+        input triand sda_i,
+        output triand scl_o,
+        output triand sda_o
+    );
 
-    task address_burst();
+    i2c_state_t state;
+    bit [I2C_ADDR_WIDTH-1:0] address;
 
-        state = ADDR;
-        if(start)begin
-		
-            foreach(captured_burst[i])begin
-                @(posedge scl_i)begin
-                    captured_burst[i] = sda_i;
-		 //   if(i==8)sda_reg = 1'b0;
-                end
-		@(negedge scl_i)begin
-		//	if(i == 8)sda_reg = 1'b1;		
-		end
-            end
-	    //@(posedge scl_i)begin
-		//sda_reg = 1'b0;
-	    //end
+    logic sda_enable;
+    reg sda_reg;
+    assign sda_o = sda_enable ? sda_reg : 1'bz;
 
-	    start = 1'b0;
+    bit [I2C_DATA_WIDTH-1:0] read_queue[$];
+    bit [I2C_DATA_WIDTH-1:0] write_queue[$];
 
-            op = captured_burst[I2C_ADDR_WIDTH-1] ? READ : WRITE;
-	    
+
+    initial restart :
+        begin
+            sda_enable <= 1'b0;
+            sda_reg <= 1'b0;
         end
-    endtask
 
-    task data_burst();
-        state = DATA;
-        foreach(captured_burst[i])begin
-            @(posedge scl_i)begin
-                captured_burst[i] = sda_i;
-		if(i==8)sda_reg = 1'b0;
-	    end
-	    @(negedge scl_i)begin
-		if(i == 8)sda_reg = 1'b1;	
-            end
-        end
-	state = STOP;
-	
-    endtask
 
-//----------------------------------------------------------------
-    task wait_for_i2c_transfers(
+
+    task wait_for_i2c_transfer(
         output i2c_op_t op, 
         output bit [I2C_DATA_WIDTH-1:0] write_data[]
     );
-    @(negedge sda_i)begin
-        if(scl_i)begin
-            state = START;
-            start = 1'b1;
-        end
-    end
-    
-    if(start) address_burst();
-    if((op == WRITE)&&(state!=STOP))begin
-	//$display("inside data");
-	data_burst();
-	burst_queue.push_front(captured_burst[0:I2C_DATA_WIDTH-1]);
-		//$display(burst_queue);
-    end
+        
+        //bit done = 1'b0;
+        
 
-    @(posedge sda_i)begin
-	//$display("here!");
-        if(scl_i)begin
-	    //$display("stop!");
-            state = STOP;
-	    write_data = burst_queue;
-	    write_data.reverse();
-		// write burst_queue into write_data
-        end
-    end
+        state = WAIT;
 
-    
+        case(state)
+            WAIT : begin
+                @(negedge sda_i)begin
+                    if(scl_i)begin
+                        state = START;
+                    end
+                end
 
+                @(posedge scl_i)begin
+                    if(scl_i)begin
+                        state = STOP;
+                    end
+                end
+            end
+            START : begin
+                state = ADDR;
+            end
+            ADDR : begin
+                write_queue.delete();
+                read_line(write_queue);
+                state = RECEIVE;
+
+            end
+            RECEIVE : begin
+                foreach(write_queue[i])begin
+                    write_data[i] = write_queue.pop_back();
+                end
+
+            end
+            SEND : begin
+                
+            end
+            STOP : begin
+                
+            end
+            
+        endcase
 
     endtask
-//----------------------------------------------------------------
-    task provide_read_data(
-        input bit [I2C_DATA_WIDTH-1:0] read_data[],
-        output bit transfer_complete
+
+    task write_line();
+    endtask
+
+    task read_line(
+        output bit [I2C_ADDR_WIDTH-1:0] captured_burst
     );
-
-	transfer_complete = 1'b0;
-
-	foreach(read_data[i]) read_queue.push_front(read_data[i]);
-	wait(!read_queue.size());
-	transfer_complete = 1'b1;
+        foreach(captured_burst[i])begin
+            @(posedge scl_i)begin
+                captured_burst[i] = sda_i;
+            end
+        end
 
     endtask
-//----------------------------------------------------------------
-    task monitor(
-        output bit [I2C_ADDR_WIDTH-1:0] addr,
-        output i2c_op_t op,
-        output bit [I2C_DATA_WIDTH-1:0] data[]
-    );
-    endtask
 
-endinterface
+endinterface    
