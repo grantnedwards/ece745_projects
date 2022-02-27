@@ -46,7 +46,6 @@ bit [I2C_DATA_WIDTH-1:0] temp;
 bit transfer_complete;
 i2c_op_t op;
 int line;
-
 //
 // ****************************************************************************
 // Clock generator
@@ -87,34 +86,86 @@ initial
 	#1000; //Match up with graph
 	wb_bus.master_write(CSR, 8'b11xx_xxxx); //Enable iicmb and irq output
 	set_bus(8'h5);
-    $display(" Writing 32 values ");
-    fork
-        begin
-            write_bus(8'h22, 8'h78);
-        end
-        begin
-            i2c_bus.wait_for_i2c_transfer(op, write_out);
-        end
-    join
-    ///
 
-    // fork
-    //     begin
-    //         // write_in = new[32];
-    //         // foreach(write_in[i])begin
-    //         //     bit [I2C_DATA_WIDTH-1:0] line;
-	// 		// 	line = i;
-	// 		// 	write_in[i] = line;
-    //         // end
-    //         // write_bus(8'h22, write_in);
-    //     end
-    //     begin
-    //         // i2c_bus.wait_for_i2c_transfer(op, write_out);
-    //     end
-    // join
+      fork
+            begin
+       
+                  
+
+                  
+                  
+                  for(int i = 0; i<8'd32; i++)begin
+                 	write_to_address(8'h44, 8'h5, i);
+                  end
+                  stop();
+                  wait_to_write();
+		$display(write_out); 
+
+                  //     
+                 
+            end
+            begin
+                  //write_data = new[200];
+                  //read_data = new[200];
+
+                  
+
+                  for(int j = 0; j<64; j++)begin
+
+                      i2c_bus.wait_for_i2c_transfers(op, write_out);
+                  end	
+                  $display(write_data); 
+                  
+                  //i2c_bus.provide_read_data(read_data, transfer_complete);
+
+                  
+                  //write_data.reverse();
+                  //$display(read_data);   
+            end
+      join
+	read_data.delete();
+	write_data.delete();
+	read_out.delete();
+	read_in.delete();
+	write_in.delete();
+	write_out.delete();
 //====================================================================================================
-    $display(" Reading 100-131 from the I2C Bus ");
+      $display(" Reading 100-131 from the I2C Bus ");
+      fork
+	    begin
+                  bit transfer_complete;
+		read_in = new [8'd32];
+		for(int blah = 0; blah < 8'd32; blah++)begin
+			bit[I2C_DATA_WIDTH - 1:0] line;
+			line = blah + 8'd100;
+			read_in[blah] = line;
+		end
+		$display("%h",read_in);
+		transfer_complete = 1'b0;
+		i2c_bus.provide_read_data(read_in, transfer_complete);
+            end
 
+	    begin
+		$display("Beep");
+		read_to_address(8'h22, read_out, 32);
+		$display("Boop");
+		$display(read_out);
+		$display("op");
+		$display(op);
+		wait(!scl);
+		for(int k = 0; k<32; k++)begin
+                        i2c_bus.wait_for_i2c_transfers(op, write_out);
+			$display("read transfer");
+                  end	
+	    end
+		
+	    begin
+		$display(write_out);
+		
+	    	
+		$display(write_out);
+            end
+      join
 
 	
 // $display(read_data);
@@ -129,66 +180,94 @@ task set_bus(input bit [WB_DATA_WIDTH-1:0] bus_num);
       wb_bus.master_write(CMDR, cmd_set_bus); //send set_bus command
 endtask
 //*******************************************************
-
-
-task write_bus(
-    input bit [I2C_ADDR_WIDTH-1:0] addr, 
-    input bit [I2C_DATA_WIDTH-1:0] data[]
-);
-    reg [WB_DATA_WIDTH-1:0] temp;
-	wb_bus.master_write(CMDR, cmd_start);
-    wait(irq);																  
-    wb_bus.master_read(CMDR, temp);
-    wb_bus.master_write(DPR, addr << 1);
-    wb_bus.master_write(CMDR, cmd_write);
-    wait(irq);																  
-    wb_bus.master_read(CMDR, temp);
-    for (int i = 0; i < data.size(); i++)
-    	begin
-			wb_bus.master_write(DPR, data[i]);
-			wb_bus.master_write(CMDR, cmd_write);
-			wait(irq);
-			wb_bus.master_read(CMDR, temp);
-    	end
-	wb_bus.master_write(CMDR, cmd_stop);
-    wait(irq);
-    wb_bus.master_read(CMDR, temp);
+task start();
+      wait_to_write(); // wait until irq is high
+      wb_bus.master_write(CMDR, cmd_start); // send command start
+endtask
+//*******************************************************
+task stop();
+      wait_to_write(); // wait until irq is high
+      wb_bus.master_write(CMDR, cmd_stop); // send command stop
+endtask
+//*******************************************************
+task write(
+            input bit [WB_DATA_WIDTH-1:0] address
+          );
+      wait_to_write();  // wait until irq is high
+      wb_bus.master_write(DPR, address); // send byte address to DPR
+      wb_bus.master_write(CMDR, cmd_write); // send write command
+endtask
+//*******************************************************
+task wait_to_write();
+      wait(irq);  // waiting until irq is high
+      wb_bus.master_read(CMDR, mon_data); // read the written data after waiting
 endtask
 
 
-task read_bus(
+task write_to_address(
+input bit [WB_DATA_WIDTH-1:0] address,input bit [WB_DATA_WIDTH-1:0] bus_num,
+input bit [WB_DATA_WIDTH-1:0] data
+
+);
+      set_bus(bus_num);    //set bus
+      start();          // enable start command
+
+      write(address);     // write in byte 0x44
+      write(data);     // write in byte 0x78
+      stop();           // enable stop command
+      //wait_to_write();  // iterates until irq is high, reads value
+	
+endtask
+
+
+task read_to_address(
 	input bit [I2C_ADDR_WIDTH-1:0] addr,
 	output bit [I2C_DATA_WIDTH-1:0] data[],
 	input int lines
 );
 
 	bit [WB_DATA_WIDTH-1:0] temp;
-	data = new[lines];
 
-	wb_bus.master_write(CMDR, cmd_start);
+	data = new[lines];
+	wb_bus.master_write(CMDR, 8'bxxxx_x100);
 	wait(irq);
 	wb_bus.master_read(CMDR, temp);
 	temp = addr << 1;
 	temp[0] = 1'b1;
 	wb_bus.master_write(DPR, temp);
-	wb_bus.master_write(CMDR, cmd_write);
+	wb_bus.master_write(CMDR, 8'bxxxx_x001);
 	wait(irq);
 	wb_bus.master_read(CMDR, temp);
 
 	for(int i = 0; i < data.size(); i++)begin
-		wb_bus.master_write(CMDR, cmd_read_ack);
+		wb_bus.master_write(CMDR, 8'bxxxx_x010);
 		wait(irq);
 		wb_bus.master_read(DPR, temp);
 		data[i] = temp;
 		wb_bus.master_read(CMDR, temp);
 	end
 
-	wb_bus.master_write(CMDR, cmd_stop);
+	wb_bus.master_write(CMDR, 8'bxxxx_x101);
 	wait(irq);
 	wb_bus.master_read(CMDR, temp);
 
 
 endtask
+
+
+function void display_i2c_data_array(input bit [I2C_DATA_WIDTH-1:0] display_data_array[], input int lines_per_unit);
+	for (int i = 0; i < display_data_array.size(); i += lines_per_unit)
+		begin
+			$write("0x ");
+			for (int j = 0; j < lines_per_unit; j++)
+				begin
+					$write("%h ", display_data_array[i+j]);
+				end
+			$write(" ");
+		end
+	return;
+endfunction
+
 
 
 // ****************************************************************************
