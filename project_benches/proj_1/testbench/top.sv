@@ -70,51 +70,47 @@ end
 // ****************************************************************************
 // Define the flow of the simulation
 initial
-    begin : wb_test_flow
-    while(rst) @(posedge clk) begin
-      #1000; //Match up with graph
+    begin : test_flow
 
-      wb_bus.master_write(CSR, 8'b11xx_xxxx); //Enable iicmb and irq output
-      
 
-      for(int i = 0; i<8'd32; i++)begin
-          write_to_address(8'h44, 8'h5, i);
-      end
-      stop();
-      wait_to_write();
-      $display(write_data);
+      fork
+            begin
+                while(rst) @(posedge clk) begin
+                  #1000; //Match up with graph
+
+                  wb_bus.master_write(CSR, 8'b11xx_xxxx); //Enable iicmb and irq output
+                  
+                  for(int i = 0; i<8'd32; i++)begin
+                  write_to_address(8'h44, 8'h5, i);
+                  end
+                  stop();
+                  wait_to_write();
+                  //     
+                  end
+            end
+            begin
+                  write_data = new[200];
+                  read_data = new[200];
+
+                  // for(int i = 0; i<32; i++)begin
+                  // 	bit [I2C_DATA_WIDTH-1:0] line;
+                  // line = i + 100;
+                  // read_data[i] = line;
+                  // end
+
+                  for(int i = 0; i<64; i++)begin
+                  i2c_bus.wait_for_i2c_transfers(op, write_data);
+                  end	
+                  $display(write_data); 
+                  //i2c_bus.provide_read_data(read_data, transfer_complete);
+                  
+                  //write_data.reverse();
+                  //$display(write_data);   
+            end
+      join
 
 // 	read_i2c(8'h22, read_data,32); 
 // $display(read_data);
-    end
-    
-end
-// ******************************
-initial 
-      begin : i2c_monitoring
-
-end
-
-initial 
-      begin : i2c_test_flow
-      write_data = new[200];
-      read_data = new[200];
-
-      // for(int i = 0; i<32; i++)begin
-      // 	bit [I2C_DATA_WIDTH-1:0] line;
-	// line = i + 100;
-	// read_data[i] = line;
-      // end
-
-      for(int i = 0; i<64; i++)begin
-	i2c_bus.wait_for_i2c_transfers(op, write_data);
-	end	
-	//i2c_bus.provide_read_data(read_data, transfer_complete);
-	
-	//write_data.reverse();
-      //$display(write_data);
-
-      
 end
 
 
