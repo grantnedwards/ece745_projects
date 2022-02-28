@@ -1,0 +1,402 @@
+# //  Questa Sim
+# //  Version 2020.4_1 linux Nov  6 2020
+# //
+# //  Copyright 1991-2020 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# vsim -i -classdebug -msgmode both -do "set NoQuitOnFinish 1; do wave.do" optimized_debug_top_tb 
+# Start time: 00:34:33 on Feb 28,2022
+# Loading sv_std.std
+# Loading work.globals(fast)
+# Loading work.top(fast)
+# Loading work.wb_if(fast__1)
+# Loading work.i2c_if_sv_unit(fast)
+# Loading work.i2c_if(fast__1)
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading work.iicmb_m_wb(str)#1
+# Loading work.wishbone(rtl)#1
+# Loading ieee.numeric_std(body)
+# Loading work.iicmb_pkg(body)
+# Loading work.regblock(rtl)#1
+# Loading work.iicmb_int_pkg(body)
+# Loading work.iicmb_m(str)#1
+# Loading work.mbyte(rtl)#1
+# Loading work.mbit(rtl)#1
+# Loading work.conditioner_mux(str)#1
+# Loading work.conditioner(str)#1
+# Loading work.filter(rtl)#1
+# Loading work.bus_state(rtl)#1
+# set NoQuitOnFinish 1
+# 1
+#  do wave.do
+run -all
+# mon_addr : 0
+# mon_data : 00
+# mon_we : 0
+# //===========================================================//
+#  Starting Simulation... 
+#  ****Bear with me and my panic spaghetti code **** 
+# //===========================================================//
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# //Bus Number 2 Op:R 	 Addr=0x22,	Data= 
+# All data output for each write is listed here
+# 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+# //===========================================================//
+#  Reading 100-131 from the I2C Bus 
+# //===========================================================//
+#         100
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+#         101
+#         102
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         103
+#         104
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         105
+#         106
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         107
+#         108
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         109
+#         110
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         111
+#         112
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         113
+#         114
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         115
+#         116
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         117
+#         118
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         119
+#         120
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         121
+#         122
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         123
+#         124
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         125
+#         126
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         127
+#         128
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         129
+#         130
+# //Bus Number 2 Op:W 	 Addr=0x7f,	Data= 
+#         131
+# //===========================================================//
+#  Alternating Read and Write  64 - 127 for write, 63 - 0 for read 
+# //===========================================================//
+# //Bus Number 2 Op:R 	 Addr=0x7f,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x40,	Data= 
+# 63
+# 64
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x06,	Data= 
+# 62
+# 65
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x0a,	Data= 
+# 61
+# 66
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x0e,	Data= 
+# 60
+# 67
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x12,	Data= 
+# 59
+# 68
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x16,	Data= 
+# 58
+# 69
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x1a,	Data= 
+# 57
+# 70
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x1e,	Data= 
+# 56
+# 71
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 55
+# 72
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x26,	Data= 
+# 54
+# 73
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x2a,	Data= 
+# 53
+# 74
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x2e,	Data= 
+# 52
+# 75
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x32,	Data= 
+# 51
+# 76
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x36,	Data= 
+# 50
+# 77
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x3a,	Data= 
+# 49
+# 78
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x3e,	Data= 
+# 48
+# 79
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x42,	Data= 
+# 47
+# 80
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x46,	Data= 
+# 46
+# 81
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x4a,	Data= 
+# 45
+# 82
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x4e,	Data= 
+# 44
+# 83
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x52,	Data= 
+# 43
+# 84
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x56,	Data= 
+# 42
+# 85
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x5a,	Data= 
+# 41
+# 86
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x5e,	Data= 
+# 40
+# 87
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x62,	Data= 
+# 39
+# 88
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x66,	Data= 
+# 38
+# 89
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x6a,	Data= 
+# 37
+# 90
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x6e,	Data= 
+# 36
+# 91
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x72,	Data= 
+# 35
+# 92
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x76,	Data= 
+# 34
+# 93
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x7a,	Data= 
+# 33
+# 94
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x7e,	Data= 
+# 32
+# 95
+# //Bus Number 2 Op:R 	 Addr=0x7c,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x04,	Data= 
+# 31
+# 96
+# //Bus Number 2 Op:R 	 Addr=0x78,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 30
+# 97
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 29
+# 98
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 28
+# 99
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 27
+# 100
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 26
+# 101
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 25
+# 102
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 24
+# 103
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 23
+# 104
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 22
+# 105
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 21
+# 106
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 20
+# 107
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 19
+# 108
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 18
+# 109
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 17
+# 110
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 16
+# 111
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 15
+# 112
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 14
+# 113
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 13
+# 114
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 12
+# 115
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 11
+# 116
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 10
+# 117
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 9
+# 118
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 8
+# 119
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 7
+# 120
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 6
+# 121
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 5
+# 122
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 4
+# 123
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 3
+# 124
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 2
+# 125
+# //Bus Number 2 Op:R 	 Addr=0x11,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 1
+# 126
+# //Bus Number 2 Op:R 	 Addr=0x44,	Data= 
+# //Bus Number 2 Op:W 	 Addr=0x22,	Data= 
+# 0
+# 127
+# //===========================================================//
+#  Simulation Completed 
+# //===========================================================//
+# ** Note: $finish    : ../testbench/top.sv(225)
+#    Time: 34778825 ns  Iteration: 1  Instance: /top
+# 1
+# Break in NamedBeginStat test_flow at ../testbench/top.sv line 225
+# End time: 01:15:20 on Feb 28,2022, Elapsed time: 0:40:47
+# Errors: 0, Warnings: 0
