@@ -1,3 +1,3 @@
-class i2c_configuration extends ncsu_configuration;
+class i2c_configuration;
 
 endclass
