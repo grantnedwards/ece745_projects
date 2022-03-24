@@ -24,7 +24,7 @@ comp_I2C_MB:
 
 
 
-comp_bench: comp_globals_pkg comp_i2cmb_env_pkg comp_ncsu_pkg comp_wb_pkg comp_i2c_pkg 
+comp_bench: comp_globals_pkg comp_i2cmb_env_pkg comp_i2c_pkg  comp_wb_pkg comp_ncsu_pkg
 	vlog ../testbench/top.sv
 
 optimize:
