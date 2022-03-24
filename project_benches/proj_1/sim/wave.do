@@ -17,6 +17,7 @@ add wave -noupdate /top/DUT/scl_i
 add wave -noupdate /top/DUT/sda_i
 add wave -noupdate /top/DUT/scl_o
 add wave -noupdate /top/DUT/sda_o
+add wave -position insertpoint sim:/top/i2c_bus/*
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {0 ns} 0}
 quietly wave cursor active 0
