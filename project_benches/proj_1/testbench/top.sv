@@ -73,6 +73,21 @@ initial
     $display ("mon_data : %x", mon_data);
     $display ("mon_we : %x", mon_we);
 end
+
+
+initial
+    begin : i2c_monitoring
+    
+	bit [I2C_ADDR_WIDTH-1:0]address;
+	i2c_op_t opcode;
+	bit [I2C_DATA_WIDTH-1:0] data[];
+	forever begin
+		data.delete();
+		i2c_bus.monitor(address, opcode, data);
+		$display("//Bus Number 2 Op:%s \t Addr=0x%h,\tData= ", i2c_bus.op ? "W" : "R", address);
+		//$write("%h ", data[1]);		
+	end
+    end
 // ****************************************************************************
 // Define the flow of the simulation
 initial
@@ -80,7 +95,15 @@ initial
 	bit [I2C_DATA_WIDTH-1: 0] write_in [];
 	bit [I2C_DATA_WIDTH-1: 0] write_out [];
 	bit [I2C_DATA_WIDTH-1: 0] read_in [];
+<<<<<<< HEAD
 	bit [I2C_DATA_WIDTH-1: 0] read_out [];
+=======
+	bit [I2C_DATA_WIDTH-1: 0] read_out []; 
+	$display("//===========================================================//");      
+	$display(" Starting Simulation... ");
+	$display(" ****Bear with me and my panic spaghetti code **** ");
+	$display("//===========================================================//");
+>>>>>>> a37e0ae91aada617b9e24024daf1dd77ab4622a0
 	
 	while (rst) @(clk);
 	#1000; //Match up with graph
@@ -89,16 +112,21 @@ initial
 
       fork
             begin
+<<<<<<< HEAD
        
                   
 
                   
                   
+=======
+
+>>>>>>> a37e0ae91aada617b9e24024daf1dd77ab4622a0
                   for(int i = 0; i<8'd32; i++)begin
                  	write_to_address(8'h44, 8'h5, i);
                   end
                   stop();
                   wait_to_write();
+<<<<<<< HEAD
 		$display(write_out); 
 
                   //     
@@ -169,11 +197,122 @@ initial
 
 	
 // $display(read_data);
+=======
+		$display(write_out);  
+                 
+            end
+            begin
+
+                  for(int j = 0; j<64; j++)begin
+			i2c_bus.wait_for_i2c_transfers(op, write_out);
+                  end	
+		  $display("All data output for each write is listed here");
+                
+            end
+      join
+
+	read_out.delete();
+	read_in.delete();
+	write_in.delete();
+	write_out.delete();
+//====================================================================================================
+	$display("//===========================================================//");      
+	$display(" Reading 100-131 from the I2C Bus ");
+	$display("//===========================================================//");      
+      fork
+	    begin
+                  bit transfer_complete;
+		read_in = new [8'd32];
+		for(int blah = 0; blah < 8'd32; blah++)begin
+			bit[I2C_DATA_WIDTH - 1:0] line;
+			line = blah + 8'd100;
+			read_in[blah] = line;
+		end
+		transfer_complete = 1'b0;
+		
+		i2c_bus.provide_read_data(read_in, transfer_complete);
+            end
+
+	    begin
+		read_to_address(8'h22, read_out, 32);
+		
+	    end
+		
+	    begin
+			i2c_bus.address_burst();
+		  for(int k = 0; k<32; k++)begin
+			$display(k+100);
+			fork
+			  begin
+				i2c_bus.extract();
+				wait(i2c_bus.scl_i);
+			  end
+			  begin
+			  	i2c_bus.data_burst();
+			  end
+                        join
+
+                  end	
+            end
+      join
+
+write_in.delete();
+write_out.delete();
+read_in.delete();
+read_out.delete();
+
+	$display("//===========================================================//");      
+	$display(" Alternating Read and Write  64 - 127 for write, 63 - 0 for read ");
+	$display("//===========================================================//"); 
+	for(int i = 0; i < 64; i++)begin
+	fork
+		begin
+		  i2c_bus.op = WRITE;
+		  i2c_bus.flag = 1'b1;
+		  write_in = new[1];
+		  write_in[0] = i + 64;
+		  write_to_address(8'h44, 8'h5, write_in[0]);
+		  stop();
+                  wait_to_write();
+		end
+
+		begin
+		  i2c_bus.wait_for_i2c_transfers(op, write_out);	
+		end
+	join
+
+	fork
+		begin
+		  i2c_bus.op = READ;
+		  read_in = new[1];
+		  read_in[0] = 63 - i;
+		  i2c_bus.provide_read_data(read_in, transfer_complete);	
+		end
+		begin
+		  read_to_address(8'h22, read_out, 1);
+		end
+		begin
+		  i2c_bus.flag = 1'b1;
+		  i2c_bus.address_burst();
+		  i2c_bus.extract();
+		  wait(i2c_bus.scl_i);
+		end
+		
+	join
+	$display(read_out);
+	$display(write_in);
+
+	end
+	$display("//===========================================================//");      
+	$display(" Simulation Completed ");
+	$display("//===========================================================//"); 
+	$finish;
+>>>>>>> a37e0ae91aada617b9e24024daf1dd77ab4622a0
 end
 
 
 //*******************************************************
-//    Tasks
+//    Tasks - Defunct for debugging
 //*******************************************************
 task set_bus(input bit [WB_DATA_WIDTH-1:0] bus_num);
       wb_bus.master_write(DPR, bus_num); //send bus number to DPR
@@ -219,6 +358,7 @@ input bit [WB_DATA_WIDTH-1:0] data
 	
 endtask
 
+<<<<<<< HEAD
 
 task read_to_address(
 	input bit [I2C_ADDR_WIDTH-1:0] addr,
@@ -230,22 +370,43 @@ task read_to_address(
 
 	data = new[lines];
 	wb_bus.master_write(CMDR, 8'bxxxx_x100);
+=======
+
+task read_to_address(
+	input bit [I2C_ADDR_WIDTH-1:0] addr,
+	output bit [I2C_DATA_WIDTH-1:0] data[],
+	input int line
+);
+
+	bit [WB_DATA_WIDTH-1:0] temp;
+	data = new[line];
+	wb_bus.master_write(CMDR, cmd_start);
+>>>>>>> a37e0ae91aada617b9e24024daf1dd77ab4622a0
 	wait(irq);
 	wb_bus.master_read(CMDR, temp);
 	temp = addr << 1;
 	temp[0] = 1'b1;
 	wb_bus.master_write(DPR, temp);
+<<<<<<< HEAD
 	wb_bus.master_write(CMDR, 8'bxxxx_x001);
 	wait(irq);
 	wb_bus.master_read(CMDR, temp);
 
 	for(int i = 0; i < data.size(); i++)begin
 		wb_bus.master_write(CMDR, 8'bxxxx_x010);
+=======
+	wb_bus.master_write(CMDR, cmd_write);
+	wait(irq);
+	wb_bus.master_read(CMDR, temp);
+	foreach(data[i])begin
+		wb_bus.master_write(CMDR, cmd_read_ack);
+>>>>>>> a37e0ae91aada617b9e24024daf1dd77ab4622a0
 		wait(irq);
 		wb_bus.master_read(DPR, temp);
 		data[i] = temp;
 		wb_bus.master_read(CMDR, temp);
 	end
+<<<<<<< HEAD
 
 	wb_bus.master_write(CMDR, 8'bxxxx_x101);
 	wait(irq);
@@ -254,6 +415,11 @@ task read_to_address(
 
 endtask
 
+=======
+	wb_bus.master_write(CMDR, cmd_stop);
+	wait(irq);
+	wb_bus.master_read(CMDR, temp);
+>>>>>>> a37e0ae91aada617b9e24024daf1dd77ab4622a0
 
 function void display_i2c_data_array(input bit [I2C_DATA_WIDTH-1:0] display_data_array[], input int lines_per_unit);
 	for (int i = 0; i < display_data_array.size(); i += lines_per_unit)
@@ -269,6 +435,7 @@ function void display_i2c_data_array(input bit [I2C_DATA_WIDTH-1:0] display_data
 endfunction
 
 
+endtask
 
 // ****************************************************************************
 // Instantiate the Wishbone master Bus Functional Model
