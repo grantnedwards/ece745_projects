@@ -1,3 +1,4 @@
+import ncsu_pkg::*;
 `include "src/i2cmb_test.svh"
 `include "src/i2cmb_generator.svh"
 `include "src/i2cmb_env_configuration.svh"
