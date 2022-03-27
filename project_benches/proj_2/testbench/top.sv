@@ -1,7 +1,7 @@
 `timescale 1ns / 10ps
 
 module top();
-import globals::*;
+import data_types_pkg::*;
 parameter int WB_ADDR_WIDTH = 2;
 parameter int WB_DATA_WIDTH = 8;
 parameter int I2C_ADDR_WIDTH = 7;
@@ -59,9 +59,9 @@ end
 // ****************************************************************************
 // Reset generator
 
-initial 
+initial
     begin : rst_gen
-    #113 rst = 1'b0; 
+    #113 rst = 1'b0;
 end
 // ****************************************************************************
 // Monitor Wishbone bus and display transfers in the transcript
@@ -77,7 +77,7 @@ end
 
 initial
     begin : i2c_monitoring
-    
+
 	bit [I2C_ADDR_WIDTH-1:0]address;
 	i2c_op_t opcode;
 	bit [I2C_DATA_WIDTH-1:0] data[];
@@ -85,7 +85,7 @@ initial
 		data.delete();
 		i2c_bus.monitor(address, opcode, data);
 		$display("//Bus Number 2 Op:%s \t Addr=0x%h,\tData= ", i2c_bus.op ? "W" : "R", address);
-		//$write("%h ", data[1]);		
+		//$write("%h ", data[1]);
 	end
     end
 // ****************************************************************************
@@ -95,12 +95,12 @@ initial
 	bit [I2C_DATA_WIDTH-1: 0] write_in [];
 	bit [I2C_DATA_WIDTH-1: 0] write_out [];
 	bit [I2C_DATA_WIDTH-1: 0] read_in [];
-	bit [I2C_DATA_WIDTH-1: 0] read_out []; 
-	$display("//===========================================================//");      
+	bit [I2C_DATA_WIDTH-1: 0] read_out [];
+	$display("//===========================================================//");
 	$display(" Starting Simulation... ");
 	$display(" ****Bear with me and my panic spaghetti code **** ");
 	$display("//===========================================================//");
-	
+
 	while (rst) @(clk);
 	#1000; //Match up with graph
 	wb_bus.master_write(CSR, 8'b11xx_xxxx); //Enable iicmb and irq output
@@ -114,16 +114,16 @@ initial
                   end
                   stop();
                   wait_to_write();
-		$display(write_out);  
-                 
+		$display(write_out);
+
             end
             begin
 
                   for(int j = 0; j<64; j++)begin
 			i2c_bus.wait_for_i2c_transfers(op, write_out);
-                  end	
+                  end
 		  $display("All data output for each write is listed here");
-                
+
             end
       join
 
@@ -132,9 +132,9 @@ initial
 	write_in.delete();
 	write_out.delete();
 //====================================================================================================
-	$display("//===========================================================//");      
+	$display("//===========================================================//");
 	$display(" Reading 100-131 from the I2C Bus ");
-	$display("//===========================================================//");      
+	$display("//===========================================================//");
       fork
 	    begin
                   bit transfer_complete;
@@ -145,15 +145,15 @@ initial
 			read_in[blah] = line;
 		end
 		transfer_complete = 1'b0;
-		
+
 		i2c_bus.provide_read_data(read_in, transfer_complete);
             end
 
 	    begin
 		read_to_address(8'h22, read_out, 32);
-		
+
 	    end
-		
+
 	    begin
 			i2c_bus.address_burst();
 		  for(int k = 0; k<32; k++)begin
@@ -168,7 +168,7 @@ initial
 			  end
                         join
 
-                  end	
+                  end
             end
       join
 
@@ -177,9 +177,9 @@ write_out.delete();
 read_in.delete();
 read_out.delete();
 
-	$display("//===========================================================//");      
+	$display("//===========================================================//");
 	$display(" Alternating Read and Write  64 - 127 for write, 63 - 0 for read ");
-	$display("//===========================================================//"); 
+	$display("//===========================================================//");
 	for(int i = 0; i < 64; i++)begin
 	fork
 		begin
@@ -193,7 +193,7 @@ read_out.delete();
 		end
 
 		begin
-		  i2c_bus.wait_for_i2c_transfers(op, write_out);	
+		  i2c_bus.wait_for_i2c_transfers(op, write_out);
 		end
 	join
 
@@ -202,7 +202,7 @@ read_out.delete();
 		  i2c_bus.op = READ;
 		  read_in = new[1];
 		  read_in[0] = 63 - i;
-		  i2c_bus.provide_read_data(read_in, transfer_complete);	
+		  i2c_bus.provide_read_data(read_in, transfer_complete);
 		end
 		begin
 		  read_to_address(8'h22, read_out, 1);
@@ -213,15 +213,15 @@ read_out.delete();
 		  i2c_bus.extract();
 		  wait(i2c_bus.scl_i);
 		end
-		
+
 	join
 	$display(read_out);
 	$display(write_in);
 
 	end
-	$display("//===========================================================//");      
+	$display("//===========================================================//");
 	$display(" Simulation Completed ");
-	$display("//===========================================================//"); 
+	$display("//===========================================================//");
 	$finish;
 end
 
@@ -270,7 +270,7 @@ input bit [WB_DATA_WIDTH-1:0] data
       write(data);     // write in byte 0x78
       stop();           // enable stop command
       //wait_to_write();  // iterates until irq is high, reads value
-	
+
 endtask
 
 
@@ -338,9 +338,9 @@ i2c_if      #(
       .I2C_DATA_WIDTH(I2C_DATA_WIDTH)
 )
 i2c_bus(
-  .scl_i(scl[0]),         
-  .sda_i(sda[0]),          
-  .scl_o(scl[0]),          
+  .scl_i(scl[0]),
+  .sda_i(sda[0]),
+  .scl_o(scl[0]),
   .sda_o(sda[0])
 );
 

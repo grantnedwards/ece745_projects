@@ -1,4 +1,4 @@
-package globals;
+package data_types_pkg;
 
    typedef enum bit {
            WRITE = 1'b0,
