@@ -22,11 +22,6 @@ class i2c_agent extends ncsu_component;
         driver.set_configuration(configuration);
         driver.build();
         driver.bus = this.bus;
-        // if (configuration.collect_coverage) begin
-        //     coverage = new("coverage",this);
-        //     coverage.set_configuration(configuration);
-        //     coverage.build();
-        // end
         monitor = new("i2c_monitor",this);
         monitor.set_configuration(configuration);
         monitor.set_agent(this);

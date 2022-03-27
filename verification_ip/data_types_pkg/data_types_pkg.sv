@@ -12,4 +12,11 @@ package data_types_pkg;
            ADDR = 2'b11
    } i2c_state_t;
 
+   typedef enum bit [3:0] { 
+           ROUTING_TABLE=4'h1, 
+           STATISTICS=4'h2, 
+           PAYLOAD=4'h4, 
+           SECURE_PAYLOAD=4'h8 
+   } header_type_t;
+
 endpackage

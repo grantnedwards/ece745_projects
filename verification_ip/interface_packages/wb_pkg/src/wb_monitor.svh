@@ -26,7 +26,6 @@ class wb_monitor extends ncsu_component#(.T(ncsu_transaction));
                     transaction.data,
                     transaction.op,
                     );
-        transaction.burst = transaction.data.size();
         agent.nb_put(transaction);
         if(enable_transaction_viewing) begin
            transaction.end_time = $time;
