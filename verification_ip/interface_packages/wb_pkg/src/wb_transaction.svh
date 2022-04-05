@@ -3,6 +3,7 @@ class wb_transaction extends ncsu_transaction;
     bit [WB_DATA_WIDTH-1:0] addr;
     bit [WB_DATA_WIDTH-1:0] data;
     i2c_op_t                  op;
+    int burst;
 
     function new(string                 name = "",
                 bit [WB_ADDR_WIDTH-1:0] addr = 0,
