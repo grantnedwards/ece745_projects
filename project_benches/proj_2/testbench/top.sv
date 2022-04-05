@@ -68,6 +68,86 @@ initial
     #113 rst = 1'b0;
 end
 
+initial 
+  begin : wait_for_i2c_transfers_run
+  
+end
+
+initial 
+  begin : test_flow_1
+  bit [I2C_DATA_WIDTH-1:0] write_in [];
+  while (rst) @(clk);
+  #1000; //Match up with graph
+  
+  wb_bus.master_write(CSR, 8'b11xx_xxxx);
+  wb_bus.master_write(DPR, 3'h5);
+  wb_bus.master_write(CMDR, cmd_set_bus);
+  wait(irq);
+  //wb_bus.master_read(CMDR, data);
+
+
+  fork
+    begin
+      write_in = new[32];
+      for(int i=0; i<32; i++)begin
+        write_in[i] = i;
+      end
+      write(8'h69, write_in);
+    end
+  join 
+end
+
+task write(
+  input bit [I2C_ADDR_WIDTH-1:0] addr, 
+  input bit [I2C_DATA_WIDTH-1:0] data []
+);
+  reg [WB_DATA_WIDTH-1:0] temp;												
+  wb_bus.master_write(CMDR, cmd_start);
+  wait(irq);
+  wb_bus.master_read(CMDR, temp);
+  wb_bus.master_write(DPR, addr << 1);
+  wb_bus.master_write(CMDR, cmd_write);
+  wait(irq);
+  wb_bus.master_read(CMDR, temp);
+  foreach(data[i])begin
+		wb_bus.master_write(DPR, data[i]);
+    wb_bus.master_write(CMDR, cmd_write);
+    wait(irq);
+    wb_bus.master_read(CMDR, temp);
+  end
+	wb_bus.master_write(CMDR, cmd_stop);
+  wait(irq);
+  wb_bus.master_read(CMDR, temp);
+endtask
+
+task read(
+	input bit [I2C_ADDR_WIDTH-1:0] addr,
+	output bit [I2C_DATA_WIDTH-1:0] data[],
+	input int line
+);
+	bit [WB_DATA_WIDTH-1:0] temp;
+	data = new[line];
+	wb_bus.master_write(CMDR, cmd_start);
+	wait(irq);
+	wb_bus.master_read(CMDR, temp);
+	temp = addr << 1;
+	temp[0] = 1'b1;
+	wb_bus.master_write(DPR, temp);
+	wb_bus.master_write(CMDR, cmd_write);
+	wait(irq);
+	wb_bus.master_read(CMDR, temp);
+	foreach(data[i])begin
+		wb_bus.master_write(CMDR, cmd_read_ack);
+		wait(irq);
+		wb_bus.master_read(DPR, temp);
+		data[i] = temp;
+		wb_bus.master_read(CMDR, temp);
+	end
+	wb_bus.master_write(CMDR, cmd_stop);
+	wait(irq);
+	wb_bus.master_read(CMDR, temp);
+endtask
+
 
 // ****************************************************************************
 // Instantiate the Wishbone master Bus Functional Model
@@ -141,22 +221,22 @@ i2c_bus(
 
 
 
-  i2cmb_test tst;
+  // i2cmb_test tst;
 
-  initial begin : project_2
-    ncsu_config_db#(virtual i2c_if#(I2C_ADDR_WIDTH, I2C_DATA_WIDTH))::set("tst.env.i2c_agents", i2c_bus);
-    ncsu_config_db#(virtual wb_if#(WB_ADDR_WIDTH, WB_DATA_WIDTH))::set("tst.env.wb_agents", wb_bus);
-    tst = new("tst", null);
-    tst.construct();
-    tst.execute();
-    wb_bus.wait_for_reset();
-    tst.run();
+  // initial begin : project_2
+  //   ncsu_config_db#(virtual i2c_if#(I2C_ADDR_WIDTH, I2C_DATA_WIDTH))::set("tst.env.i2c_agents", i2c_bus);
+  //   ncsu_config_db#(virtual wb_if#(WB_ADDR_WIDTH, WB_DATA_WIDTH))::set("tst.env.wb_agents", wb_bus);
+  //   tst = new("tst", null);
+  //   tst.construct();
+  //   tst.execute();
+  //   wb_bus.wait_for_reset();
+  //   tst.run();
 
-    //HAVE MERCY ON MY SOUL FOR THIS PROJECT
-    $display("================FINISHED================");
-    $display("Mind the spaghetti code! It works though!");
-    $display("=========================================");
-    $finish();
-  end
+  //   //HAVE MERCY ON MY SOUL FOR THIS PROJECT
+  //   $display("================FINISHED================");
+  //   $display("Mind the spaghetti code! It works though!");
+  //   $display("=========================================");
+  //   $finish();
+  // end
 
 endmodule
