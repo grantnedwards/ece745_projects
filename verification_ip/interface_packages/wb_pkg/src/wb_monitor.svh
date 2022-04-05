@@ -1,4 +1,4 @@
-class wb_monitor extends ncsu_component#(.T(ncsu_transaction));
+class wb_monitor extends ncsu_component#(.T(wb_transaction));
 
   wb_configuration  configuration;
   virtual wb_if bus;
@@ -20,12 +20,14 @@ class wb_monitor extends ncsu_component#(.T(ncsu_transaction));
   virtual task run ();
     bus.wait_for_reset();
       forever begin
+        bit write_enable;
         transaction = new("WB Monitors");
-        if (enable_transaction_viewing)transaction.start_time = $time;
-        bus.monitor(transaction.addr,
+        if (enable_transaction_viewing) transaction.start_time = $time;
+        bus.master_monitor(transaction.addr,
                     transaction.data,
-                    transaction.op,
+                    write_enable
                     );
+
         agent.nb_put(transaction);
         if(enable_transaction_viewing) begin
            transaction.end_time = $time;

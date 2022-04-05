@@ -1,4 +1,4 @@
-class environment extends ncsu_component#(.T(ncsu_transaction));
+class i2cmb_environment extends ncsu_component#(.T(wb_transaction));
 
   i2cmb_env_configuration configuration;
   i2c_agent         i2c_agents;
@@ -7,9 +7,9 @@ class environment extends ncsu_component#(.T(ncsu_transaction));
   i2cmb_scoreboard        scbd;
   i2cmb_coverage          cvg;
 
-  function new(string name = "", ncsu_component #(T) parent = null); 
+  function new(string name = "", ncsu_component_base parent = null);
     super.new(name,parent);
-  endfunction 
+  endfunction
 
   function void set_configuration(i2cmb_env_configuration cfg);
     configuration = cfg;
@@ -27,20 +27,20 @@ class environment extends ncsu_component#(.T(ncsu_transaction));
     pred.build();
     scbd  = new("scbd", this);
     scbd.build();
-    cvg = new("coverage", this);
+    cvg = new("cvg", this);
     cvg.set_configuration(configuration);
     cvg.build();
-    i2c_agents.connect_subscriber(cvg);
-    i2c_agents.connect_subscriber(pred);
+    wb_agents.connect_subscriber(cvg);
+    wb_agents.connect_subscriber(pred);
     pred.set_scoreboard(scbd);
-    wb_agents.connect_subscriber(scbd);
+    i2c_agents.connect_subscriber(scbd);
   endfunction
 
-  function ncsu_component#(T) get_i2c_agent();
+  function i2c_agent get_i2c_agent();
     return i2c_agents;
   endfunction
 
-  function ncsu_component#(T) get_wb_agent();
+  function wb_agent get_wb_agent();
     return wb_agents;
   endfunction
 

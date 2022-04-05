@@ -188,7 +188,7 @@ assign sda_o = sda_enable ? sda_reg2 : 1'bz;
 	for(int i = 0; i < read_data.size(); i++)begin
 		read_queue.push_front(read_data[i]);
 	end
-	wait(read_queue.size()==0);
+	//wait(read_queue.size()==0);
 	transfer_complete = 1'b1;
 
     endtask
@@ -210,7 +210,7 @@ assign sda_o = sda_enable ? sda_reg2 : 1'bz;
 	address_burst_mon();
     	addr=captured_burst_mon[0:7];
     end
-    if((op_mon == WRITE)&&(state_mon!=STOP))begin
+    if((op_mon ==0)&&(state_mon!=STOP))begin
 	data_burst_mon();
 	data_mon[pack] = captured_burst_mon;
 
@@ -227,7 +227,7 @@ assign sda_o = sda_enable ? sda_reg2 : 1'bz;
 			end
 		end
 	end
-    if((op_mon == READ)&&(state_mon!=STOP))begin
+    if((op_mon == 1)&&(state_mon!=STOP))begin
 	data_mon[pack] = read_queue_mon.pop_back();
 pack++;
 	//send_burst_mon(data);

@@ -1,7 +1,8 @@
-class i2c_monitor extends ncsu_component#(.T(ncsu_transaction));
+class i2c_monitor extends ncsu_component#(.T(i2c_transaction));
 
   i2c_configuration  configuration;
   virtual i2c_if bus;
+  i2c_transaction transaction;
   i2c_transaction monitored_trans;
   ncsu_component #(T) agent;
 
@@ -18,20 +19,15 @@ class i2c_monitor extends ncsu_component#(.T(ncsu_transaction));
   endfunction
 
   virtual task run ();
-    bus.wait_for_reset();
       forever begin
-        monitored_trans = new("I2C Monitors");
-        if ( enable_transaction_viewing)monitored_trans.start_time = $time;
+        monitored_trans = new("i2c_monitor");
+        transaction = new("interstitial");
         bus.monitor(monitored_trans.addr,
-                    monitored_trans.data,
                     monitored_trans.op,
+                    monitored_trans.data
                     );
         monitored_trans.burst = monitored_trans.data.size();
         agent.nb_put(monitored_trans);
-        if(enable_transaction_viewing) begin
-           monitored_trans.end_time = $time;
-           monitored_trans.add_to_wave(transaction_viewing_stream);
-        end
     end
   endtask
 

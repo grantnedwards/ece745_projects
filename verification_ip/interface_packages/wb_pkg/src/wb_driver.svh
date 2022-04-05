@@ -1,9 +1,9 @@
 class wb_driver extends ncsu_component#(.T(ncsu_transaction));
     virtual wb_if bus;
-    i2c_transaction transaction;
+    wb_transaction transaction;
     wb_configuration configuration;
 
-    function new(string name = "", ncsu_component #(T) parent = null); 
+    function new(string name = "", ncsu_component_base parent = null);
         super.new(name,parent);
     endfunction
 
@@ -13,12 +13,17 @@ class wb_driver extends ncsu_component#(.T(ncsu_transaction));
     //POTENTIAL ISSUES
     virtual task bl_put(T trans);
         $cast(transaction, trans);
-        set_bus(transaction.burst);
-        wait_to_write(); 
-        if(transaction.op) read_to_address(transaction.addr, transaction.data, transaction.burst);
-        else write_to_address(transaction.addr, transaction.data);
+        if(transaction.op) bus.master_read(transaction.addr, transaction.data);
+        else begin
+          bus.master_write(transaction.addr, transaction.data);
+          if(transaction.addr == CMDR)begin
+            bit [WB_DATA_WIDTH-1:0] tip;
+            bus.wait_for_interrupt();
+            bus.master_read(CMDR, tip);
+          end
+        end
     endtask
-    
+
     reg [WB_DATA_WIDTH-1:0] mon_data;
     //*******************************************************
     //    Tasks - Defunct for debugging
@@ -53,26 +58,18 @@ class wb_driver extends ncsu_component#(.T(ncsu_transaction));
 
 
     task write_to_address(
-    input bit [WB_DATA_WIDTH-1:0] address, input bit [WB_DATA_WIDTH-1:0] data []
+    input bit [WB_DATA_WIDTH-1:0] address,input bit [WB_DATA_WIDTH-1:0] bus_num,
+    input bit [WB_DATA_WIDTH-1:0] data
+
     );
-        reg [WB_DATA_WIDTH-1:0] temp;
-        bus.master_write(CMDR, cmd_start);
-        bus.wait_for_interrupt();
-        bus.master_read(CMDR, temp);
-        bus.master_write(DPR, address << 1);
-        bus.master_write(CMDR, cmd_write);
-        bus.wait_for_interrupt();
-        bus.master_read(CMDR, temp);
-        for (int i = 0; i < data.size(); i++)
-            begin
-                bus.master_write(DPR, data[i]);
-                bus.master_write(CMDR, cmd_write);
-                bus.wait_for_interrupt();
-                bus.master_read(CMDR, temp);
-            end
-            bus.master_write(CMDR, cmd_stop);
-        bus.wait_for_interrupt();
-        bus.master_read(CMDR, temp);
+          set_bus(bus_num);    //set bus
+          start();          // enable start command
+
+          write(address);     // write in byte 0x44
+          write(data);     // write in byte 0x78
+          stop();           // enable stop command
+          //wait_to_write();  // iterates until irq is high, reads value
+
     endtask
 
 

@@ -1,4 +1,4 @@
-class wb_agent extends ncsu_component#(.T(ncsu_transaction));
+class wb_agent extends ncsu_component#(.T(wb_transaction));
   wb_configuration configuration;
   wb_driver        driver;
   wb_monitor       monitor;

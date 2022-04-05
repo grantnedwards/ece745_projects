@@ -12,12 +12,12 @@ class i2cmb_env_configuration extends ncsu_configuration;
         coverpoint invert;
         coverpoint port_delay;
     endgroup
-    
+
     function void sample_coverage();
   	    i2cmb_env_configuration_cg.sample();
     endfunction
 
-    function new(string name=""); 
+    function new(string name="");
         super.new(name);
         i2cmb_env_configuration_cg = new;
         i2c_config = new("i2c_config");
@@ -26,5 +26,5 @@ class i2cmb_env_configuration extends ncsu_configuration;
         i2c_config.sample_coverage();
         wishbone_config.sample_coverage();
     endfunction
-    
+
 endclass

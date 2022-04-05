@@ -4,17 +4,16 @@ class i2c_transaction extends ncsu_transaction;
     i2c_op_t op;
     int bus;
     int burst;
+    bit transfer_complete;
 
 
     function new(string name="",
-                 int                        bus = 0,
+                 i2c_op_t                        op = WRITE,
                  bit [I2C_ADDR_WIDTH-1:0]   addr = 0,
-                 int                        burst = 0,
-                 i2c_op_t                   op = WRITE
+                 int                           bus = 0
                 );
         super.new(name);
         this.addr = addr;
-        this.burst = burst;
         this.bus = bus;
         this.op = op;
     endfunction
@@ -28,14 +27,13 @@ class i2c_transaction extends ncsu_transaction;
         burst = data.size();
     endfunction
 
-    virtual function void add_to_wave(int transaction_viewing_stream_h);
-        super.add_to_wave(transaction_viewing_stream_h);
-        $add_attribute(transaction_view_h, op, "op");
-        $add_attribute(transaction_view_h, addr, "addr");
-        $add_attribute(transaction_view_h, data, "data");
-        $add_attribute(transaction_view_h, bus, "bus");
-        $end_transaction(transaction_view_h, end_time);
-        $free_transaction(transaction_view_h);
+    function bit compare(i2c_transaction rhs);
+        for(int i = 0; i < this.burst; i++) if(this.data[i]!=rhs.data[i]) return 0;
+        if(this.burst != rhs.burst) return 0;
+        if(this.op != rhs.op) return 0;
+        if(this.bus != rhs.bus) return 0;
+        if(this.addr != rhs.addr)return 0;
     endfunction
+
 
 endclass
