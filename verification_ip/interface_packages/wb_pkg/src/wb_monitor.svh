@@ -27,7 +27,8 @@ class wb_monitor extends ncsu_component#(.T(wb_transaction));
                     transaction.data,
                     write_enable
                     );
-
+        if(write_enable) transaction.op = WRITE;
+        else transaction.op = READ;
         agent.nb_put(transaction);
         if(enable_transaction_viewing) begin
            transaction.end_time = $time;

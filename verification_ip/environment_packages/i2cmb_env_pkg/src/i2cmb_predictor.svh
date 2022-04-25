@@ -24,42 +24,42 @@ class i2cmb_predictor extends ncsu_component#(.T(wb_transaction));
     case(state)
       STARTER : begin
         flag = 0;
-        if((wb.addr == 8'h2)&&(wb.data[2:0] == 3'h4)&&(wb.op==WRITE))
+        if((wb.addr == CMDR)&&(wb.data[2:0] == 3'b100)&&(wb.op==WRITE))
           begin
-            pred = new("predicted transaction");
+            pred = new("pred");
             pred.bus = bus;
             state = RUNNER;
           end
-        if((wb.addr == 8'h1)&&(wb.op == WRITE))
+        if((wb.addr == DPR)&&(wb.op == WRITE))
           begin
             state = WRITER;
             temp = wb.data;
           end
       end
       RUNNER : begin
-        if((wb.addr == 8'h1) && (wb.op == WRITE))
+        if((wb.addr == DPR) && (wb.op == WRITE))
           begin
             state = WRITER;
             temp = wb.data;
           end
-        else if((wb.addr == 8'h2) && (wb.op == WRITE))
+        else if((wb.addr == CMDR) && (wb.op == WRITE))
           begin
-            if(wb.data[2:0]==3'h5) begin
+            if(wb.data[2:0]==3'b101) begin
               state = STARTER;
               scoreboard.nb_transport(pred, act);
             end
-            else if(wb.data[2:0]==3'h2)state = READER;
+            else if(wb.data[2:0]==3'b010)state = READER;
           end
       end
       WRITER : begin
-        if((wb.addr == 8'h2)&&(wb.data[2:0] == 3'h6))begin
+        if((wb.addr == CMDR)&&(wb.data[2:0] == 3'b110))begin
           state = STARTER;
           bus = temp;
         end
         else begin
-          if((wb.addr == 8'h2)&&(wb.data[2:0] == 3'h1))begin
+          if((wb.addr == CMDR)&&(wb.data[2:0] == 3'b001))begin
             if(flag)begin
-              pred.burst = pred.burst + 1;
+              pred.burst += 1;
               pred.data = new[pred.burst](pred.data);
               pred.data[pred.burst-1] = temp;
               //scoreboard.nb_transport(pred, act);
@@ -67,22 +67,22 @@ class i2cmb_predictor extends ncsu_component#(.T(wb_transaction));
             else begin
               //$display(temp);
               pred.addr = temp >> 1;
-              pred.op = temp[0] ? READ : WRITE;
+              pred.op = temp[0] ? WRITE : READ;
               flag = 1;
             end
           end
-          //else $display("DPR without Bus Write - Check Predictor/WB Transactions");
+          else $display("DPR without Bus Write - Check Predictor/WB Transactions");
           state = RUNNER;
         end
       end
       READER : begin
-        if((wb.addr == 8'h1) && (wb.op == READ))begin
+        if((wb.addr == DPR) && (wb.op == READ))begin
           state = RUNNER;
-          pred.burst = pred.burst + 1;
+          pred.burst += 1;
           pred.data = new[pred.burst](pred.data);
           pred.data[pred.burst-1] = wb.data;
         end
-        else if((wb.addr != 8'h2) && (wb.op != READ))begin
+        else if((wb.addr != CMDR) && (wb.op != READ))begin
           //$display("Read without DPR - Check Predictor/ WB Transactions");
         end
       end

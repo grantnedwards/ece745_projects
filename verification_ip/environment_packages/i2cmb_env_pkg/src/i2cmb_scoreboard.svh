@@ -17,7 +17,7 @@ bit flag1;
     $cast(trans_in, input_trans);
     if (flag1)
       begin
-        if (trans_in.compare(temp))$display({get_full_name(), "transaction MISMATCH"});
+        if (trans_in.compare(temp)==1)$display({get_full_name(), "transaction MISMATCH"});
         else $display({get_full_name(), "transaction MATCH"});
         flag1 = 1'b0;
       end
@@ -28,7 +28,7 @@ bit flag1;
     virtual function void nb_put(T trans);
       if (flag2)
         begin
-          if (trans_in.compare(trans))$display({get_full_name(), "transaction MISMATCH"});
+          if (trans_in.compare(trans)==1)$display({get_full_name(), "transaction MISMATCH"});
           else $display({get_full_name(), "transaction MATCH"});
           flag2 = 1'b0;
         end

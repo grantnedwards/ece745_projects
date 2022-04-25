@@ -15,16 +15,12 @@ class i2c_driver extends ncsu_component#(.T(ncsu_transaction));
     virtual task bl_put(T trans);
         bit transfer_complete;
         $cast(transaction, trans);
-        if(!transaction.op)
-        fork
-          begin
-            bus.provide_read_data(transaction.data, transfer_complete);   
-          end
-          begin
+        if (transaction.op == WRITE) bus.wait_for_i2c_transfers(transaction.op, transaction.data);
+        else
+          fork
+            bus.provide_read_data(transaction.data, transfer_complete);
             bus.wait_for_i2c_transfers(transaction.op, transaction.data);
-          end
-        join
-        else bus.wait_for_i2c_transfers(transaction.op, transaction.data);
+          join
     endtask
 
 endclass

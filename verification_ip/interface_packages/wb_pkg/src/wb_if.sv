@@ -1,6 +1,6 @@
 interface wb_if       #(
       int ADDR_WIDTH = 2,
-      int DATA_WIDTH = 8                                
+      int DATA_WIDTH = 8
       )
 (
   // System sigals
@@ -23,6 +23,17 @@ interface wb_if       #(
   output reg [DATA_WIDTH-1:0] dat_o,
   input wire [DATA_WIDTH-1:0] dat_i
   );
+
+  property rst_i_correct;
+    @(posedge clk_i)((clk_i==1&&rst_i==1)==0);
+  endproperty
+
+  property i2cmb_arbitration;
+    @(posedge clk_i) 1'b1;
+  endproperty
+
+  assert property(rst_i_correct) else $error("rst_i was not passed correctly");
+  assert property(i2cmb_arbitration) else $error("error in i2cmb arbitration");
 
   initial reset_bus();
 

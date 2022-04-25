@@ -2,6 +2,7 @@ class wb_agent extends ncsu_component#(.T(wb_transaction));
   wb_configuration configuration;
   wb_driver        driver;
   wb_monitor       monitor;
+  wb_coverage      coverage;
   ncsu_component #(T) subscribers[$];
   virtual wb_if    bus;
 
@@ -28,6 +29,8 @@ class wb_agent extends ncsu_component#(.T(wb_transaction));
       monitor.enable_transaction_viewing = 1;
       monitor.build();
       monitor.bus = this.bus;
+      coverage=new();
+      connect_subscriber(coverage);
   endfunction
 
   virtual function void nb_put(T trans);

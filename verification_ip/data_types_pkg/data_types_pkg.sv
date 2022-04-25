@@ -5,13 +5,6 @@ package data_types_pkg;
            READ = 1'b1
            } i2c_op_t;
 
-//    typedef enum bit [1:0]{
-//            START = 2'b00,
-//            STOP = 2'b01,
-//            DATA = 2'b10,
-//            ADDR = 2'b11
-//    } i2c_state_t;
-
    typedef enum bit [3:0] {
            ROUTING_TABLE=4'h1,
            STATISTICS=4'h2,

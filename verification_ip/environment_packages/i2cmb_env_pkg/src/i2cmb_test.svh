@@ -57,8 +57,7 @@ class i2cmb_test extends ncsu_component;
        gen.write_transactions(8'h22, write_dbl[i]);
        gen.read_transactions(8'h22, read_dbl[i]);
      end
-
-gen.transfer();
-
+    gen.transfer();
+    run();
   endtask
 endclass

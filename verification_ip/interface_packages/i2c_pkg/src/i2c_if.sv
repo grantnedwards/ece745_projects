@@ -54,14 +54,17 @@ assign sda_o = sda_enable ? sda_reg2 : 1'bz;
         output bit [I2C_DATA_WIDTH-1:0] write_data[]
     );
     bit temp;
-    timer_t dir; 
+    timer_t dir;
     bit [I2C_ADDR_WIDTH-1:0] addr;
     bit [I2C_DATA_WIDTH-1:0] burst;
     int size;
     bit [I2C_DATA_WIDTH-1:0] in_data[$];
     bit [I2C_DATA_WIDTH-1:0] out_data[$];
     stately_t state;
-        
+    bit finish;
+    state = INIT;
+    finish = 1'b0;
+    while(~finish)begin
         case(state)
             INIT :  begin
 
@@ -71,7 +74,7 @@ assign sda_o = sda_enable ? sda_reg2 : 1'bz;
 
                     end
             ADDR :  begin
-
+                    in_data.delete();
                     for(int i = 6; i>= 0; i--)begin
                         selection(dir, temp);
                         addr[i] = temp;
@@ -98,7 +101,7 @@ assign sda_o = sda_enable ? sda_reg2 : 1'bz;
                             size = in_data.size();
                             write_data = new[size];
                             for(int i=0; i<size; i++) write_data[i] = in_data.pop_back();
-                            complete = 1'b1;
+                            finish = 1'b1;
                             state = INIT;
                         end
                     else
@@ -116,12 +119,13 @@ assign sda_o = sda_enable ? sda_reg2 : 1'bz;
                     selection(dir, temp);
 		            if(read_queue.size()==0)begin
                         state = INIT;
-                        complete = 1'b1;
+                        finish = 1'b1;
                     end
                     else state = OUT;
                     end
             default: state = INIT;
         endcase
+    end
     endtask
 
     task selection(output timer_t state, output bit data);
@@ -142,7 +146,7 @@ assign sda_o = sda_enable ? sda_reg2 : 1'bz;
 				if(~ender)state=DATA;
 				else state=STOP;
 			end
-		data = start;		
+		data = start;
     endtask
 //----------------------------------------------------------------
 //     task detect_state(output i2c_op_t);
@@ -184,16 +188,100 @@ assign sda_o = sda_enable ? sda_reg2 : 1'bz;
     );
 	transfer_complete = 1'b0;
 	for(int i = 0; i < read_data.size(); i++)read_queue.push_front(read_data[i]);
-    wait(read_queue.size()==0);
 	transfer_complete = 1'b1;
 
     endtask
 //----------------------------------------------------------------
     task monitor(
         output bit [I2C_ADDR_WIDTH-1:0] addr,
-        output i2c_op_t op_mon,
+        output i2c_op_t op,
         output bit [I2C_DATA_WIDTH-1:0] data[]
     );
+    bit temp;
+    timer_t dir;
+    bit [I2C_DATA_WIDTH-1:0] burst;
+    int size;
+    bit [I2C_DATA_WIDTH-1:0] in_data[$];
+    bit [I2C_DATA_WIDTH-1:0] out_data[$];
+    stately_t state;
+    bit finish;
+    state = INIT;
+    finish = 1'b0;
+    while(~finish)begin
+        case(state)
+            INIT :  begin
+
+                    selection(dir, temp);
+                    if(dir == START)    state = ADDR;
+                    else                state = INIT;
+
+                    end
+            ADDR :  begin
+                    bit [I2C_DATA_WIDTH-1:0] burst;
+                    for(int i = 6; i>= 0; i--)begin
+                        selection(dir, temp);
+                        addr[i] = temp;
+                    end
+                    selection(dir, temp);
+                    if(temp)    op = READ;
+                    else        op = WRITE;
+
+                    //bit_sda(0);
+                    for(int i = 7; i>=0; i--)begin
+                        selection(dir, temp);
+                        if(dir != DATA) break;
+                        burst[i] = temp;
+                    end
+
+                    if(op)      state = OUT;
+                    else        state = IN;
+
+                    end
+            IN :    begin
+                    bit [I2C_DATA_WIDTH-1:0] burst;
+                    for(int i = 7; i>=0; i--)begin
+                        selection(dir, temp);
+                        if(dir != DATA) break;
+                        burst[i] = temp;
+                    end
+                    if(dir == START) state = ADDR;
+                    else if (dir == STOP)begin
+                            size = in_data.size();
+                            data = new[size];
+                            for(int i=0; i<size; i++) data[i] = in_data.pop_back();
+                            finish = 1'b1;
+                            state = INIT;
+                        end
+                    else
+                        begin
+                            in_data.push_front(burst);
+                            for(int i = 7; i>=0; i--)begin
+                                selection(dir, temp);
+                                if(dir != DATA) break;
+                                burst[i] = temp;
+                            end
+                        end
+                    end
+            OUT :   begin
+                    bit [I2C_DATA_WIDTH-1:0] burst;
+                    burst = read_queue.pop_back();
+                    for(int i = 7; i>=0; i--)begin
+                        for(int i = 7; i>=0; i--)begin
+                        selection(dir, temp);
+                        if(dir != DATA) break;
+                        burst[i] = temp;
+                        end
+                    end
+                    selection(dir, temp);
+		            if(read_queue.size()==0)begin
+                        state = INIT;
+                        finish = 1'b1;
+                    end
+                    else state = OUT;
+                    end
+            default: state = INIT;
+        endcase
+    end
     endtask
 
 endinterface

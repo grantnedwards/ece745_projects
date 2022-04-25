@@ -13,18 +13,22 @@ class wb_driver extends ncsu_component#(.T(ncsu_transaction));
     //POTENTIAL ISSUES
     virtual task bl_put(T trans);
         $cast(transaction, trans);
-        bus.master_write(DPR, transaction.bus);
-        bus.master_write(CMDR, 8'bxxxxx110);
-        bus.wait_for_interrupt();
-        if(transaction.op) read(transaction.addr, transaction.data, );
-        else write(transaction.addr, transaction.data);
+        if(transaction.op) bus.master_read(transaction.addr, transaction.data);
+        else begin
+          bus.master_write(transaction.addr, transaction.data);
+          if(transaction.addr == CMDR)begin
+            bit [WB_DATA_WIDTH-1:0] tip;
+            bus.wait_for_interrupt();
+            bus.master_read(CMDR, tip);
+          end
+        end
     endtask
 
     task write(
-    input bit [I2C_ADDR_WIDTH-1:0] addr, 
+    input bit [I2C_ADDR_WIDTH-1:0] addr,
     input bit [I2C_DATA_WIDTH-1:0] data []
     );
-    reg [WB_DATA_WIDTH-1:0] temp;												
+    reg [WB_DATA_WIDTH-1:0] temp;
     bus.master_write(CMDR, cmd_start);
     bus.wait_for_interrupt();
     bus.master_read(CMDR, temp);
